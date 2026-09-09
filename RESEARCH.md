@@ -1,14 +1,25 @@
 ## Introduction
 
-This document researches options for building a **personal daily hub** — a single page that surfaces a curated set of bookmarks alongside dashboard widgets (weather, calendar, RSS/news, quick notes, etc.). The core goal is a **lightweight web/JS app that can be deployed freely to static hosting providers such as Netlify**, and that serves as an internet-accessible start page for daily activities — not a locally-run desktop tool or a self-hosted server application.
+This document researches options for building a **personal daily hub** — a single page that surfaces a curated set of bookmarks alongside dashboard widgets (weather, calendar, RSS/news, quick notes, etc.). The core goal is a **lightweight web/JS app**, built as a static export and served from self-managed hosting, that acts as an internet-accessible start page for daily activities — not a locally-run desktop tool.
 
 A reference project ([danielrosehill/Day-Planner-Dashboard](https://github.com/danielrosehill/Day-Planner-Dashboard)) offers a useful feature checklist but is built for a different niche (a 7" kiosk screen, a local Flask app, tightly coupled to Gmail/Google Calendar OAuth) and is not suited to static hosting as-is.
 
 Three broad approaches emerged from research, covered in turn below:
 
-1. **Static/DIY web dashboard** — the primary fit for this project's goal: a lightweight static site, deployed to Netlify or a similar static host, with no server to run or maintain.
+1. **Static/DIY web dashboard** — the primary fit for this project's goal: a lightweight static site, deployable to Netlify-style hosts or served from self-managed hosting, with no application server logic required.
 2. **Turnkey self-hosted dashboard apps** — existing open-source projects, mostly designed to run continuously via Docker rather than as a static deploy; useful as prior art and feature inspiration.
 3. **Browser extension "new tab" replacements** — client-side only, per-browser, no hosting needed at all.
+
+## Selected Configuration
+
+Based on the options below, the following direction has been chosen for this project:
+
+- **Tech stack:** React + Next.js, using **static export** (`next.config` `output: 'export'`) — no Next.js server, API routes, or middleware; the build output is plain static HTML/CSS/JS.
+- **Hosting:** Self-hosted (the static export served from infrastructure managed independently, e.g. Nginx/Caddy behind a reverse proxy, rather than a managed platform like Netlify). Because it's self-hosted rather than a locked-down static host, a small companion backend/proxy can still be added later if a feature needs one (e.g. keeping an OAuth client secret server-side) without changing the frontend build.
+- **Widgets:** weather ([Open-Meteo](https://open-meteo.com/), no API key required), a calendar widget that connects to a Google/Gmail account to display events, and a daily mountain photo.
+- **Bookmarks:** a categorized personal link list (Tech, News, Hobby, Faith, Facebook, and a "2026" category for time-bound items), listed in full under [Bookmarks (Dashboard Content)](#bookmarks-dashboard-content) below.
+
+A note on the calendar widget specifically: a Next.js static export cannot run server-side API routes, so a Google account connection (OAuth) needs either (a) a client-side OAuth flow (e.g. Google Identity Services / PKCE, which needs no server), or (b) a small separate backend/proxy service — feasible here since hosting is self-managed — to hold the OAuth client secret and refresh tokens. Both are compatible with keeping the frontend itself a static export.
 
 ## Reference Project: Day-Planner-Dashboard
 
@@ -33,13 +44,14 @@ A lightweight static site built with plain JS or a small frontend framework, dep
 ### Build-your-own stack options
 | Layer | Options | Notes |
 |---|---|---|
-| Framework | Plain HTML/JS (like [Homer](https://github.com/bastienwirtz/homer)), Vue 3 + Vite, React/Next.js (static export), Svelte/SvelteKit (static adapter) | A framework-free build keeps the app dependency-light; Vite-based frameworks give fast builds and good static-export support, which suits a Netlify-style deploy well. |
+| Framework | **React/Next.js (static export)** — selected; alternatives: plain HTML/JS (like [Homer](https://github.com/bastienwirtz/homer)), Vue 3 + Vite, Svelte/SvelteKit (static adapter) | Next.js static export (`output: 'export'`) gives a component-based structure and a large ecosystem while still producing a plain static bundle. |
 | Bookmarks | JSON/YAML file committed to the repo, rendered as tiles/grid | Config-as-code — bookmarks and layout live in version control, editable via a normal commit. |
-| Weather | [Open-Meteo](https://open-meteo.com/) (free, no API key, used by the reference project) or OpenWeatherMap | Open-Meteo is the simplest no-auth option for a purely client-side call, which matters since a static site has no server to hide keys behind. |
-| Calendar | A Google Calendar "Embed" iframe, or client-side parsing of a public/secret **ICS feed** (e.g. with `ical.js`), or CalDAV for other providers | An embedded iframe needs no code; an ICS parse allows a custom-styled agenda list. |
-| News/RSS | Client-side RSS parsing via a public CORS proxy, or a small serverless function (Netlify Functions, Vercel Edge Functions, Cloudflare Workers) to fetch/normalize feeds | Most static hosts ship a companion serverless-function product for exactly this kind of light backend need, without giving up the "no server to manage" property. |
-| Hosting | **Netlify** (primary target — free tier, git-based deploys, built-in Functions), Vercel, Cloudflare Pages, GitHub Pages | All are free-tier, git-push-to-deploy static hosts; Netlify Functions or an equivalent covers any case where an API key needs to stay server-side. |
-| Auth (optional) | Netlify Identity or a similar hosted auth add-on, or none if the page doesn't need to be gated | Only relevant if the page should not be publicly viewable as-is. |
+| Weather | **[Open-Meteo](https://open-meteo.com/)** (free, no API key, used by the reference project) | Selected — simplest no-auth option for a purely client-side call, which matters since the static export has no server of its own to hide keys behind. |
+| Calendar | **Google account connection** (client-side OAuth, or a small self-hosted proxy for server-side token handling), vs. a simpler Google Calendar "Embed" iframe or client-side **ICS feed** parsing (e.g. with `ical.js`) | An account connection gives read access to real calendar data rather than a single public calendar; feasible here because hosting is self-managed, so a companion token-handling service can run alongside the static site if needed. |
+| Daily photo | A rotating "mountain photo of the day" widget — e.g. a photo API call (Unsplash-style) filtered to a mountain query, made client-side, or a small self-hosted job that picks/serves one | Purely decorative widget; simplest as a client-side API call, same pattern as weather. |
+| News/RSS | Client-side RSS parsing via a CORS proxy, or a small self-hosted service to fetch/normalize feeds | With self-managed hosting, this can be a small companion service rather than a public CORS proxy. |
+| Hosting | **Self-hosted** — the static export served via a reverse proxy (Nginx/Caddy) or a lightweight container, on infrastructure managed independently (as opposed to a managed platform like Netlify/Vercel) | Selected. Netlify/Vercel/Cloudflare Pages/GitHub Pages remain valid alternatives if managed hosting is preferred later — the static build output is portable to any of them without changes. |
+| Auth (optional) | Self-managed (e.g. a reverse-proxy auth layer, or none if the page doesn't need to be gated) | Only relevant if the page should not be publicly viewable as-is. |
 
 ### Why this option fits the goal
 - Deploys with a straightforward `git push` to Netlify (or an equivalent host) — no server to provision, patch, or pay for beyond a free tier.
@@ -77,16 +89,64 @@ Client-side only, no hosting required — replaces a browser's new-tab page dire
 
 ## Recommendation
 
-Given the stated goal — a lightweight web/JS app deployable freely to sites like Netlify, serving as an internet start page for daily activities — **Option 1 (DIY static dashboard)** is the direct fit:
+Given the [Selected Configuration](#selected-configuration) above, **Option 1 (DIY static dashboard)** is the direct fit, built as follows:
 
-1. Build a small static site (framework-free or a lightweight Vite-based framework) with bookmarks and widget layout defined as JSON/YAML in the repo.
-2. Use Open-Meteo for weather and either an embedded calendar or client-side ICS parsing for calendar data — both work without a backend.
-3. Deploy to Netlify with git-based continuous deployment; reach for Netlify Functions (or an equivalent) only for the rare case of needing to keep an API key off the client.
-4. Optionally, once the page has a public URL, pair it with a "New Tab Override"-style browser extension (Option 3) to make it the default new-tab page.
+1. Scaffold a Next.js app with `output: 'export'` set, so `next build` produces a plain static bundle deployable anywhere.
+2. Define bookmarks and widget layout as JSON/YAML in the repo (config-as-code), rendered as tiles/grid — see [Bookmarks (Dashboard Content)](#bookmarks-dashboard-content) for the initial link set.
+3. Add the weather widget via Open-Meteo (client-side call, no key needed).
+4. Add the calendar widget via a client-side Google OAuth flow, or a small self-hosted proxy service if server-side token handling is preferred.
+5. Add a daily mountain photo widget (e.g. a rotating image source or a photo API call made client-side).
+6. Serve the static export from self-managed hosting (reverse proxy in front of a static file server, or a container serving the build output).
+7. Optionally, once the page has a stable URL, pair it with a "New Tab Override"-style browser extension (Option 3) to make it the default new-tab page.
 
-Option 2 (turnkey self-hosted apps) remains useful as a source of feature ideas and UX patterns — particularly Homepage and Glance for widget breadth, and Homer as the one example that is itself a static deploy — but as a category it targets a persistent-server hosting model rather than the static/Netlify deployment this project is aiming for.
+Option 2 (turnkey self-hosted apps) remains useful as a source of feature ideas and UX patterns — particularly Homepage and Glance for widget breadth, and Homer as the one example that is itself a static deploy — but as a category it targets a persistent always-on service model rather than a static React/Next.js export.
 
-## Links Reference
+## Bookmarks (Dashboard Content)
+
+The initial bookmark set for the dashboard, grouped by category as they will appear on the page.
+
+### Tech
+- [The New Stack](https://thenewstack.io/)
+- [Hacker News](https://news.ycombinator.com/)
+- [The Engineering Mindset](https://theengineeringmindset.com/)
+- [Medium](https://medium.com/)
+- [Martin Alderson](https://martinalderson.com/)
+
+### News
+- [Reuters](https://www.reuters.com/)
+- [БНТ новини](https://bntnews.bg/)
+- [bNews.bg](https://bnews.bg/)
+- [money.bg](https://money.bg/)
+- [pariteni.bg](https://pariteni.bg/)
+
+### Hobby
+- [sportal.bg](https://sportal.bg/)
+- [FIA Formula 2 Calendar](https://www.fiaformula2.com/Calendar)
+- [Celsi Blog](https://celsi.bg/blog/)
+- [БНР – Музика (Sofia)](https://bnrnews.bg/sofia/list/muzica)
+- [iFactsBG](https://ifactsbg.com/)
+- [Vicove — Новини](https://www.vicove.biz/novi)
+
+### Faith
+- [Българска патриаршия — Новини](https://bg-patriarshia.bg/news)
+- [UOJ.news](https://uoj.news/)
+
+### Facebook
+- [Дневното четиво](https://www.facebook.com/DnevnotoChetivo)
+- [Facebook Group](https://www.facebook.com/groups/2021908914616022)
+- [Емилия Дворянова](https://www.facebook.com/emiliya.dvoryanova)
+- [Отец Владимир Дойчев](https://www.facebook.com/otecvladimir.doychev)
+- [gkadiev](https://www.facebook.com/gkadiev/)
+
+### 2026
+- [MaistorExpo 2026](https://lozanov.bg/maistorexpo-2026/)
+- [5km Run](https://5kmrun.bg/)
+- [Поклонение за празника на Св. Злата](https://poklonnik.bg/st_tour/%D0%BF%D0%BE%D0%BA%D0%BB%D0%BE%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B7%D0%B0-%D0%BF%D1%80%D0%B0%D0%B7%D0%BD%D0%B8%D0%BA%D0%B0-%D0%BD%D0%B0-%D1%81%D0%B2-%D0%B7%D0%BB%D0%B0%D1%82%D0%B0-%D0%BC%D1%8A%D0%B3/)
+- [Sofia Stage](https://sofiastage.com/)
+
+*(The MaistorExpo 2026 link is stored above without its tracking query string — the original included Facebook click-tracking parameters (`fbclid`, `utm_*`) which are safe to drop since they only affect ad-attribution, not the destination page.)*
+
+## Links Reference (Research Sources)
 
 - [danielrosehill/Day-Planner-Dashboard](https://github.com/danielrosehill/Day-Planner-Dashboard) — reference project
 - [darekkay/dashboard](https://github.com/darekkay/dashboard) (live: [dashboard.darekkay.com](https://dashboard.darekkay.com))
@@ -99,10 +159,11 @@ Option 2 (turnkey self-hosted apps) remains useful as a source of feature ideas 
 - [linuxserver/Heimdall](https://github.com/linuxserver/Heimdall)
 - [Tabliss](https://tabliss.io/) / [joelshepherd/tabliss](https://github.com/joelshepherd/tabliss)
 - [Open-Meteo](https://open-meteo.com/) — free weather API, no key required
-- [Netlify documentation](https://docs.netlify.com/)
+- [Netlify documentation](https://docs.netlify.com/) — kept as a managed-hosting alternative, even though self-hosting is the current choice
 
 ## Next Steps
 
-Once a direction is chosen, possible follow-ups include:
-- Scaffolding the repo structure for the DIY static approach (framework choice, bookmarks config schema, weather/calendar widget stubs, Netlify deploy configuration), or
-- Deeper research on a specific integration (e.g. ICS/calendar parsing approaches, or a full widget inventory for Homepage/Glance as design references).
+Possible follow-ups include:
+- Scaffolding the Next.js (static export) repo structure: bookmarks config schema (matching the categories above), widget components (weather, calendar, daily photo), and the self-hosting deploy setup (reverse proxy / container).
+- Deciding the calendar widget's OAuth approach (client-side vs. a small self-hosted proxy service) before implementation.
+- Picking a concrete source for the daily mountain photo widget (a specific photo API vs. a self-hosted rotating image set).
