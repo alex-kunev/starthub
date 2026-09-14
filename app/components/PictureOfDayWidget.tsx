@@ -15,8 +15,8 @@ type State =
   | { status: 'ready'; photo: Photo };
 
 // The image object's shape differs slightly between the two Wikimedia
-// endpoints we try below, so pull whichever fields are actually present
-// rather than assuming one fixed shape.
+// endpoints below, so pull whichever fields are actually present rather
+// than assuming one fixed shape.
 function normalizePhoto(raw: any): Photo | null {
   const source = raw?.image?.source ?? raw?.thumbnail?.source ?? raw?.originalimage?.source;
   if (!source) return null;
@@ -29,6 +29,18 @@ function normalizePhoto(raw: any): Photo | null {
   };
 }
 
+function fetchPhoto(url: string): Promise<Photo> {
+  return fetch(url)
+    .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
+    .then((json) => {
+      // The featured-content feed nests the picture under "image";
+      // the media endpoint returns it directly.
+      const photo = normalizePhoto(json.image ?? json);
+      if (!photo) throw new Error('no image in response');
+      return photo;
+    });
+}
+
 export default function PictureOfDayWidget() {
   const [state, setState] = useState<State>({ status: 'loading' });
 
@@ -39,32 +51,23 @@ export default function PictureOfDayWidget() {
     const dd = String(now.getDate()).padStart(2, '0');
 
     // Wikimedia Commons' own "Picture of the Day", via Wikipedia's public
-    // REST API — free, no key. Two endpoints can serve it; try the fuller
-    // "featured content" feed first, then the narrower media endpoint.
-    const urls = [
-      `https://en.wikipedia.org/api/rest_v1/feed/featured/${yyyy}/${mm}/${dd}`,
-      `https://en.wikipedia.org/api/rest_v1/media/image/featured/${yyyy}/${mm}/${dd}`,
-    ];
+    // REST API — free, no key. Plain Promise chaining here (no
+    // async/await) — a static-export build of an async/await + for-of
+    // combination was shipping code that referenced regeneratorRuntime
+    // without defining it, breaking this widget in production.
+    const featuredFeedUrl = `https://en.wikipedia.org/api/rest_v1/feed/featured/${yyyy}/${mm}/${dd}`;
+    const mediaImageUrl = `https://en.wikipedia.org/api/rest_v1/media/image/featured/${yyyy}/${mm}/${dd}`;
 
-    (async () => {
-      for (const url of urls) {
-        try {
-          const res = await fetch(url);
-          if (!res.ok) continue;
-          const json = await res.json();
-          // The featured-content feed nests the picture under "image";
-          // the media endpoint returns it directly.
-          const photo = normalizePhoto(json.image ?? json);
-          if (photo) {
-            setState({ status: 'ready', photo });
-            return;
-          }
-        } catch (err) {
-          console.error('Picture of the Day: fetch failed for', url, err);
-        }
-      }
-      setState({ status: 'error' });
-    })();
+    fetchPhoto(featuredFeedUrl)
+      .catch((err) => {
+        console.error('Picture of the Day: fetch failed for', featuredFeedUrl, err);
+        return fetchPhoto(mediaImageUrl);
+      })
+      .then((photo) => setState({ status: 'ready', photo }))
+      .catch((err) => {
+        console.error('Picture of the Day: fetch failed for', mediaImageUrl, err);
+        setState({ status: 'error' });
+      });
   }, []);
 
   return (

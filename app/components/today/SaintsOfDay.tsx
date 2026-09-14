@@ -12,6 +12,19 @@ type State =
   | { status: 'error' }
   | { status: 'ready'; extract: string };
 
+function fetchExtract(base: string, title: string): Promise<string> {
+  const url = `${base}?action=query&prop=extracts&exintro=1&explaintext=1&titles=${title}&format=json&origin=*`;
+  return fetch(url)
+    .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
+    .then((json) => {
+      const pages = json?.query?.pages;
+      const page = pages ? Object.values(pages)[0] : null;
+      const extract = (page as { extract?: string } | null)?.extract;
+      if (!extract) throw new Error('no extract in response');
+      return extract.slice(0, 600);
+    });
+}
+
 export default function SaintsOfDay() {
   const [state, setState] = useState<State>({ status: 'loading' });
   const [pageTitle, setPageTitle] = useState('');
@@ -30,29 +43,20 @@ export default function SaintsOfDay() {
     // OrthodoxWiki runs on MediaWiki, which supports cross-origin API
     // requests via an explicit origin=* parameter — no proxy needed. The
     // API script's path varies between MediaWiki installs (root vs "/w/"),
-    // so try both rather than assuming one.
-    const apiBases = ['https://orthodoxwiki.org/api.php', 'https://orthodoxwiki.org/w/api.php'];
-
-    (async () => {
-      for (const base of apiBases) {
-        const url = `${base}?action=query&prop=extracts&exintro=1&explaintext=1&titles=${title}&format=json&origin=*`;
-        try {
-          const res = await fetch(url);
-          if (!res.ok) continue;
-          const json = await res.json();
-          const pages = json?.query?.pages;
-          const page = pages ? Object.values(pages)[0] : null;
-          const extract = (page as { extract?: string } | null)?.extract;
-          if (extract) {
-            setState({ status: 'ready', extract: extract.slice(0, 600) });
-            return;
-          }
-        } catch (err) {
-          console.error('Saints of the Day: fetch failed for', base, err);
-        }
-      }
-      setState({ status: 'error' });
-    })();
+    // so try both rather than assuming one. Plain Promise chaining here
+    // (no async/await) — a static-export build of an async/await + for-of
+    // combination was shipping code that referenced regeneratorRuntime
+    // without defining it, breaking this widget in production.
+    fetchExtract('https://orthodoxwiki.org/api.php', title)
+      .catch((err) => {
+        console.error('Saints of the Day: fetch failed for orthodoxwiki.org/api.php', err);
+        return fetchExtract('https://orthodoxwiki.org/w/api.php', title);
+      })
+      .then((extract) => setState({ status: 'ready', extract }))
+      .catch((err) => {
+        console.error('Saints of the Day: fetch failed for orthodoxwiki.org/w/api.php', err);
+        setState({ status: 'error' });
+      });
   }, []);
 
   const wikiUrl = pageTitle ? `https://orthodoxwiki.org/${pageTitle}` : 'https://orthodoxwiki.org/';
