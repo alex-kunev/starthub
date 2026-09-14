@@ -45,3 +45,7 @@ Everything is configured directly in the repo — no environment variables neede
 - **Weather location** — edit `lib/config.ts` (`siteConfig.weather`).
 - **Calendar** — edit `lib/config.ts` (`siteConfig.calendar.calendarId`). The id is the calendar owner's address (or a group calendar id); the calendar must be shared publicly in Google Calendar's sharing settings for the embed to show anything.
 - **Bookmarks** — edit `data/bookmarks.json` directly; each entry is `{ "name": "Category", "emoji": "💻", "color": "#5b9dff", "links": [{ "label": "...", "url": "..." }] }`.
+
+## Deploying to Netlify
+
+`netlify.toml` disables Netlify's post-processing "Asset optimization" for JS (`build.processing.js.bundle`/`minify = false`). Next.js's own production build already minifies the client bundle; Netlify's extra pass can re-mangle modern `async`/`await` output, which shows up in the browser console as `Uncaught ReferenceError: regeneratorRuntime is not defined` and silently breaks every widget that fetches data. If you still see that error after deploying with `netlify.toml` present, double-check Site configuration → Build & deploy → Post processing → Asset optimization is off in the Netlify dashboard too (a manually-set dashboard toggle can coexist with the repo config), then trigger a fresh deploy (clear cache).

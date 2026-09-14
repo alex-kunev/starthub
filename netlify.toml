@@ -1,0 +1,9 @@
+# Next.js's own production build already minifies and optimizes the
+# client bundle. Netlify's post-processing "Asset optimization" step can
+# re-bundle/re-minify that output in a way that breaks modern async/await
+# code (surfaces in the browser console as "regeneratorRuntime is not
+# defined"), so it's disabled here rather than relying on a dashboard
+# toggle someone has to remember.
+[build.processing.js]
+  bundle = false
+  minify = false
