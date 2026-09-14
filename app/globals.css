@@ -261,6 +261,16 @@ body {
   flex: 1 1 300px;
 }
 
+.widgets-grid-single {
+  justify-content: center;
+}
+
+.widgets-grid-single .photo-widget {
+  flex: none;
+  width: 100%;
+  max-width: 460px;
+}
+
 .weather-current {
   display: flex;
   align-items: center;

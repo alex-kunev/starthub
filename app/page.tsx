@@ -18,10 +18,13 @@ export default function Home() {
       <section className="widgets-grid">
         <WeatherWidget />
         <CalendarWidget />
-        <PictureOfDayWidget />
       </section>
 
       <BookmarksSection categories={bookmarks} />
+
+      <section className="widgets-grid widgets-grid-single">
+        <PictureOfDayWidget />
+      </section>
     </main>
   );
 }
