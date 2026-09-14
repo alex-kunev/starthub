@@ -6,6 +6,12 @@ export const siteConfig = {
     latitude: 42.6977,
     longitude: 23.3219,
   },
-  calendarApiUrl: process.env.NEXT_PUBLIC_CALENDAR_API_URL || '',
-  unsplashAccessKey: process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY || '',
+  // Public Google Calendar to embed. Derived from the "cid" in a
+  // calendar.google.com share link (base64-decoded, it's the calendar's id —
+  // usually the owner's email for a personal calendar). Only works for
+  // calendars whose sharing settings are "Make available to public".
+  calendar: {
+    calendarId: 'alex087@gmail.com',
+    timezone: 'Europe/Sofia',
+  },
 };

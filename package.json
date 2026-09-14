@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "lint": "next lint",
-    "calendar-proxy": "node server/calendar-proxy.js"
+    "lint": "next lint"
   },
   "dependencies": {
     "next": "^15.0.0",

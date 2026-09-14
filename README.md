@@ -1,12 +1,12 @@
-## Starthub
+## StartHub
 
-A personal daily start page — bookmarks, weather, calendar, and a daily mountain photo — built as a static site. Background and option analysis: see [RESEARCH.md](./RESEARCH.md).
+A personal daily start page — clock & week view, saints of the day and "on this day" events, weather with air quality and a 7-day forecast, a connected calendar, a daily picture, and categorized bookmarks. Built as a static site. Background and option analysis: see [RESEARCH.md](./RESEARCH.md).
 
 ## Tech Stack
 
 - **Next.js** (App Router, static export — `output: 'export'` in `next.config.js`)
 - **React**, TypeScript, plain CSS (no UI framework/dependency beyond Next itself)
-- Client-side data: [Open-Meteo](https://open-meteo.com/) for weather, Unsplash API for the daily photo, and an optional companion calendar proxy for events
+- All data is fetched client-side from free, keyless public APIs — no backend, no environment variables required
 
 ## Running Locally
 
@@ -25,25 +25,23 @@ npm run build
 
 Output goes to `out/` — a plain static site, deployable to any static file server or reverse proxy (Nginx, Caddy, etc).
 
+## Widgets & Data Sources
+
+| Widget | Source | Notes |
+|---|---|---|
+| Clock & week view | Local browser time | No network call |
+| Saints of the day | [OrthodoxWiki](https://orthodoxwiki.org/) (via its MediaWiki API), linking out to [OCA's Lives of the Saints](https://www.oca.org/saints/lives) | Gregorian-dated page per day; falls back to link-only if the summary fetch fails |
+| On this day | [Wikipedia "On this day" API](https://en.wikipedia.org/api/rest_v1/) | No key needed |
+| Weather + 7-day forecast | [Open-Meteo](https://open-meteo.com/) | No key needed; edit coordinates in `lib/config.ts` |
+| Air quality | [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) | European AQI |
+| Calendar | Google Calendar's public embed | Only works for a calendar shared as "Make available to public"; configured in `lib/config.ts` |
+| Picture of the day | Wikimedia Commons' "Picture of the Day", via Wikipedia's REST API | No key needed |
+| Bookmarks | `data/bookmarks.json` | Config-as-code — each category renders as its own tile |
+
 ## Configuration
 
-Copy `.env.example` to `.env.local` and fill in what you need:
+Everything is configured directly in the repo — no environment variables needed:
 
-- **Weather** — no environment variable needed; edit the coordinates directly in `lib/config.ts`.
-- **Mountain photo** — set `NEXT_PUBLIC_UNSPLASH_ACCESS_KEY` (a free [Unsplash API](https://unsplash.com/developers) key). Without it, the widget shows a "not configured" placeholder instead of guessing at mountain photos from an unrelated source.
-- **Calendar** — set `NEXT_PUBLIC_CALENDAR_API_URL` to point at the calendar-proxy service described below. Without it, the widget shows a "not configured" placeholder.
-- **Bookmarks** — edit `data/bookmarks.json` directly; each entry is `{ "name": "Category", "links": [{ "label": "...", "url": "..." }] }`.
-
-## Calendar Proxy (optional)
-
-Next.js static export has no API routes, so connecting a real calendar (e.g. a Google account) needs a small separate service rather than a client-side call. `server/calendar-proxy.js` is a dependency-free Node script that fetches a Google Calendar "secret address in iCal format" URL server-side and serves it as JSON, so the URL itself never ships in the client bundle.
-
-```bash
-CALENDAR_ICS_URL="https://calendar.google.com/calendar/ical/.../basic.ics" \
-CALENDAR_ALLOWED_ORIGIN="https://your-domain.example" \
-npm run calendar-proxy
-```
-
-Run it alongside the static site (pm2, systemd, or a container) and point `NEXT_PUBLIC_CALENDAR_API_URL` at it (e.g. `http://localhost:4001/events`).
-
-To get the ICS URL: in Google Calendar, go to the calendar's **Settings and sharing**, and copy the **Secret address in iCal format**.
+- **Weather location** — edit `lib/config.ts` (`siteConfig.weather`).
+- **Calendar** — edit `lib/config.ts` (`siteConfig.calendar.calendarId`). The id is the calendar owner's address (or a group calendar id); the calendar must be shared publicly in Google Calendar's sharing settings for the embed to show anything.
+- **Bookmarks** — edit `data/bookmarks.json` directly; each entry is `{ "name": "Category", "emoji": "💻", "color": "#5b9dff", "links": [{ "label": "...", "url": "..." }] }`.

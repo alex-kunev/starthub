@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Starthub',
+  title: 'StartHub',
   description: 'Personal daily start page — bookmarks, weather, calendar and more.',
 };
 

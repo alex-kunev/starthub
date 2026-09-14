@@ -1,6 +1,8 @@
 [
   {
     "name": "Tech",
+    "emoji": "💻",
+    "color": "#5b9dff",
     "links": [
       { "label": "The New Stack", "url": "https://thenewstack.io/" },
       { "label": "Hacker News", "url": "https://news.ycombinator.com/" },
@@ -11,6 +13,8 @@
   },
   {
     "name": "News",
+    "emoji": "📰",
+    "color": "#ff6b6b",
     "links": [
       { "label": "Reuters", "url": "https://www.reuters.com/" },
       { "label": "БНТ новини", "url": "https://bntnews.bg/" },
@@ -21,6 +25,8 @@
   },
   {
     "name": "Hobby",
+    "emoji": "🎯",
+    "color": "#4ade80",
     "links": [
       { "label": "sportal.bg", "url": "https://sportal.bg/" },
       { "label": "FIA Formula 2 Calendar", "url": "https://www.fiaformula2.com/Calendar" },
@@ -32,6 +38,8 @@
   },
   {
     "name": "Faith",
+    "emoji": "✝️",
+    "color": "#c792ea",
     "links": [
       { "label": "Българска патриаршия — Новини", "url": "https://bg-patriarshia.bg/news" },
       { "label": "UOJ.news", "url": "https://uoj.news/" }
@@ -39,6 +47,8 @@
   },
   {
     "name": "Facebook",
+    "emoji": "👥",
+    "color": "#38bdf8",
     "links": [
       { "label": "Дневното четиво", "url": "https://www.facebook.com/DnevnotoChetivo" },
       { "label": "Facebook Group", "url": "https://www.facebook.com/groups/2021908914616022" },
@@ -49,6 +59,8 @@
   },
   {
     "name": "2026",
+    "emoji": "📌",
+    "color": "#ffb454",
     "links": [
       { "label": "MaistorExpo 2026", "url": "https://lozanov.bg/maistorexpo-2026/" },
       { "label": "5km Run", "url": "https://5kmrun.bg/" },

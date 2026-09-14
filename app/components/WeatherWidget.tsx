@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { siteConfig } from '@/lib/config';
+import { aqiLabel, weatherIcon, weatherLabel } from '@/lib/weather';
 
 interface CurrentWeather {
   temperature: number;
@@ -9,53 +10,105 @@ interface CurrentWeather {
   weathercode: number;
 }
 
-// Subset of the WMO weather codes Open-Meteo returns — enough for a
-// one-line summary, not the full table.
-const WEATHER_CODES: Record<number, string> = {
-  0: 'Clear sky',
-  1: 'Mainly clear',
-  2: 'Partly cloudy',
-  3: 'Overcast',
-  45: 'Fog',
-  48: 'Rime fog',
-  51: 'Light drizzle',
-  53: 'Moderate drizzle',
-  55: 'Dense drizzle',
-  61: 'Slight rain',
-  63: 'Moderate rain',
-  65: 'Heavy rain',
-  71: 'Slight snow',
-  73: 'Moderate snow',
-  75: 'Heavy snow',
-  80: 'Rain showers',
-  95: 'Thunderstorm',
-};
+interface DailyForecast {
+  time: string[];
+  weathercode: number[];
+  temperature_2m_max: number[];
+  temperature_2m_min: number[];
+}
+
+interface AirQuality {
+  aqi: number;
+  label: string;
+}
+
+type ForecastState =
+  | { status: 'loading' }
+  | { status: 'error' }
+  | { status: 'ready'; current: CurrentWeather; daily: DailyForecast };
+
+function closestIndex(times: string[]): number {
+  const now = Date.now();
+  let best = 0;
+  let bestDiff = Infinity;
+  times.forEach((t, i) => {
+    const diff = Math.abs(new Date(t).getTime() - now);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      best = i;
+    }
+  });
+  return best;
+}
 
 export default function WeatherWidget() {
-  const [data, setData] = useState<CurrentWeather | null>(null);
-  const [error, setError] = useState(false);
+  const [forecast, setForecast] = useState<ForecastState>({ status: 'loading' });
+  const [airQuality, setAirQuality] = useState<AirQuality | null>(null);
 
   useEffect(() => {
     const { latitude, longitude } = siteConfig.weather;
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
 
-    fetch(url)
+    const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
+    fetch(forecastUrl)
       .then((res) => res.json())
-      .then((json) => setData(json.current_weather))
-      .catch(() => setError(true));
+      .then((json) => setForecast({ status: 'ready', current: json.current_weather, daily: json.daily }))
+      .catch(() => setForecast({ status: 'error' }));
+
+    // Air quality is on a separate Open-Meteo host from the weather forecast.
+    const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&hourly=european_aqi&timezone=auto`;
+    fetch(aqiUrl)
+      .then((res) => res.json())
+      .then((json) => {
+        const times: string[] = json?.hourly?.time ?? [];
+        const values: number[] = json?.hourly?.european_aqi ?? [];
+        if (times.length === 0) return;
+        const aqi = values[closestIndex(times)];
+        if (typeof aqi === 'number') setAirQuality({ aqi, label: aqiLabel(aqi) });
+      })
+      .catch(() => {
+        // Air quality is a bonus on top of the core forecast — fail quietly.
+      });
   }, []);
 
   return (
     <div className="widget weather-widget">
-      <h2>Weather — {siteConfig.weather.label}</h2>
-      {error && <p>Unable to load weather.</p>}
-      {!error && !data && <p>Loading…</p>}
-      {data && (
-        <p>
-          {Math.round(data.temperature)}°C, {WEATHER_CODES[data.weathercode] ?? 'Unknown conditions'}
-          <br />
-          Wind: {Math.round(data.windspeed)} km/h
-        </p>
+      <h2>🌦️ Weather — {siteConfig.weather.label}</h2>
+
+      {forecast.status === 'loading' && <p className="muted">Loading…</p>}
+      {forecast.status === 'error' && <p className="muted">Unable to load weather.</p>}
+
+      {forecast.status === 'ready' && (
+        <>
+          <div className="weather-current">
+            <span className="weather-icon">{weatherIcon(forecast.current.weathercode)}</span>
+            <div>
+              <div className="weather-temp">{Math.round(forecast.current.temperature)}°C</div>
+              <div className="muted">
+                {weatherLabel(forecast.current.weathercode)} · Wind {Math.round(forecast.current.windspeed)} km/h
+              </div>
+            </div>
+            {airQuality && (
+              <span className={`aqi-badge aqi-${airQuality.label.toLowerCase().replace(/\s+/g, '-')}`}>
+                Air quality: {airQuality.label} ({airQuality.aqi})
+              </span>
+            )}
+          </div>
+
+          <div className="forecast-strip">
+            {forecast.daily.time.map((day, i) => (
+              <div className="forecast-day" key={day}>
+                <span className="forecast-day-label">
+                  {i === 0 ? 'Today' : new Date(day).toLocaleDateString([], { weekday: 'short' })}
+                </span>
+                <span className="forecast-icon">{weatherIcon(forecast.daily.weathercode[i])}</span>
+                <span className="forecast-temps">
+                  <strong>{Math.round(forecast.daily.temperature_2m_max[i])}°</strong>{' '}
+                  <span className="muted">{Math.round(forecast.daily.temperature_2m_min[i])}°</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
