@@ -28,19 +28,31 @@ export default function SaintsOfDay() {
     setOcaUrl(`https://www.oca.org/saints/lives/${y}/${m}/${d}`);
 
     // OrthodoxWiki runs on MediaWiki, which supports cross-origin API
-    // requests via an explicit origin=* parameter — no proxy needed.
-    const url = `https://orthodoxwiki.org/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${title}&format=json&origin=*`;
+    // requests via an explicit origin=* parameter — no proxy needed. The
+    // API script's path varies between MediaWiki installs (root vs "/w/"),
+    // so try both rather than assuming one.
+    const apiBases = ['https://orthodoxwiki.org/api.php', 'https://orthodoxwiki.org/w/api.php'];
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((json) => {
-        const pages = json?.query?.pages;
-        const page = pages ? Object.values(pages)[0] : null;
-        const extract = (page as { extract?: string } | null)?.extract;
-        if (!extract) throw new Error('no extract');
-        setState({ status: 'ready', extract: extract.slice(0, 600) });
-      })
-      .catch(() => setState({ status: 'error' }));
+    (async () => {
+      for (const base of apiBases) {
+        const url = `${base}?action=query&prop=extracts&exintro=1&explaintext=1&titles=${title}&format=json&origin=*`;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const json = await res.json();
+          const pages = json?.query?.pages;
+          const page = pages ? Object.values(pages)[0] : null;
+          const extract = (page as { extract?: string } | null)?.extract;
+          if (extract) {
+            setState({ status: 'ready', extract: extract.slice(0, 600) });
+            return;
+          }
+        } catch (err) {
+          console.error('Saints of the Day: fetch failed for', base, err);
+        }
+      }
+      setState({ status: 'error' });
+    })();
   }, []);
 
   const wikiUrl = pageTitle ? `https://orthodoxwiki.org/${pageTitle}` : 'https://orthodoxwiki.org/';
