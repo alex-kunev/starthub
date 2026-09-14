@@ -17,7 +17,7 @@ Based on the options below, the following direction has been chosen for this pro
 - **Tech stack:** React + Next.js, using **static export** (`next.config` `output: 'export'`) — no Next.js server, API routes, or middleware; the build output is plain static HTML/CSS/JS.
 - **Hosting:** Self-hosted (the static export served from infrastructure managed independently, e.g. Nginx/Caddy behind a reverse proxy, rather than a managed platform like Netlify). Because it's self-hosted rather than a locked-down static host, a small companion backend/proxy can still be added later if a feature needs one (e.g. keeping an OAuth client secret server-side) without changing the frontend build.
 - **Widgets:** weather ([Open-Meteo](https://open-meteo.com/), no API key required), a calendar widget that connects to a Google/Gmail account to display events, and a daily mountain photo.
-- **Bookmarks:** a categorized personal link list (Tech, News, Hobby, Faith, Facebook, and a "2026" category for time-bound items), listed in full under [Bookmarks (Dashboard Content)](#bookmarks-dashboard-content) below.
+- **Bookmarks:** a categorized personal link list (Tech, News, Hobby, Faith, Facebook, and a "2026" category for time-bound items), maintained as config-as-code in the app's `data/bookmarks.json`.
 
 A note on the calendar widget specifically: a Next.js static export cannot run server-side API routes, so a Google account connection (OAuth) needs either (a) a client-side OAuth flow (e.g. Google Identity Services / PKCE, which needs no server), or (b) a small separate backend/proxy service — feasible here since hosting is self-managed — to hold the OAuth client secret and refresh tokens. Both are compatible with keeping the frontend itself a static export.
 
@@ -92,7 +92,7 @@ Client-side only, no hosting required — replaces a browser's new-tab page dire
 Given the [Selected Configuration](#selected-configuration) above, **Option 1 (DIY static dashboard)** is the direct fit, built as follows:
 
 1. Scaffold a Next.js app with `output: 'export'` set, so `next build` produces a plain static bundle deployable anywhere.
-2. Define bookmarks and widget layout as JSON/YAML in the repo (config-as-code), rendered as tiles/grid — see [Bookmarks (Dashboard Content)](#bookmarks-dashboard-content) for the initial link set.
+2. Define bookmarks and widget layout as JSON/YAML in the repo (config-as-code), rendered as tiles/grid.
 3. Add the weather widget via Open-Meteo (client-side call, no key needed).
 4. Add the calendar widget via a client-side Google OAuth flow, or a small self-hosted proxy service if server-side token handling is preferred.
 5. Add a daily mountain photo widget (e.g. a rotating image source or a photo API call made client-side).
@@ -101,50 +101,18 @@ Given the [Selected Configuration](#selected-configuration) above, **Option 1 (D
 
 Option 2 (turnkey self-hosted apps) remains useful as a source of feature ideas and UX patterns — particularly Homepage and Glance for widget breadth, and Homer as the one example that is itself a static deploy — but as a category it targets a persistent always-on service model rather than a static React/Next.js export.
 
-## Bookmarks (Dashboard Content)
+## Similar Personal Dashboard / Start Page Repos
 
-The initial bookmark set for the dashboard, grouped by category as they will appear on the page.
+Other individually-built, open-source personal start pages in the same spirit as [darekkay/dashboard](https://github.com/darekkay/dashboard) — small, self-authored projects (as opposed to the larger maintained "homelab" tools in the comparison table above) that combine bookmarks with widgets like clock, weather, and calendar:
 
-### Tech
-- [The New Stack](https://thenewstack.io/)
-- [Hacker News](https://news.ycombinator.com/)
-- [The Engineering Mindset](https://theengineeringmindset.com/)
-- [Medium](https://medium.com/)
-- [Martin Alderson](https://martinalderson.com/)
-
-### News
-- [Reuters](https://www.reuters.com/)
-- [БНТ новини](https://bntnews.bg/)
-- [bNews.bg](https://bnews.bg/)
-- [money.bg](https://money.bg/)
-- [pariteni.bg](https://pariteni.bg/)
-
-### Hobby
-- [sportal.bg](https://sportal.bg/)
-- [FIA Formula 2 Calendar](https://www.fiaformula2.com/Calendar)
-- [Celsi Blog](https://celsi.bg/blog/)
-- [БНР – Музика (Sofia)](https://bnrnews.bg/sofia/list/muzica)
-- [iFactsBG](https://ifactsbg.com/)
-- [Vicove — Новини](https://www.vicove.biz/novi)
-
-### Faith
-- [Българска патриаршия — Новини](https://bg-patriarshia.bg/news)
-- [UOJ.news](https://uoj.news/)
-
-### Facebook
-- [Дневното четиво](https://www.facebook.com/DnevnotoChetivo)
-- [Facebook Group](https://www.facebook.com/groups/2021908914616022)
-- [Емилия Дворянова](https://www.facebook.com/emiliya.dvoryanova)
-- [Отец Владимир Дойчев](https://www.facebook.com/otecvladimir.doychev)
-- [gkadiev](https://www.facebook.com/gkadiev/)
-
-### 2026
-- [MaistorExpo 2026](https://lozanov.bg/maistorexpo-2026/)
-- [5km Run](https://5kmrun.bg/)
-- [Поклонение за празника на Св. Злата](https://poklonnik.bg/st_tour/%D0%BF%D0%BE%D0%BA%D0%BB%D0%BE%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B7%D0%B0-%D0%BF%D1%80%D0%B0%D0%B7%D0%BD%D0%B8%D0%BA%D0%B0-%D0%BD%D0%B0-%D1%81%D0%B2-%D0%B7%D0%BB%D0%B0%D1%82%D0%B0-%D0%BC%D1%8A%D0%B3/)
-- [Sofia Stage](https://sofiastage.com/)
-
-*(The MaistorExpo 2026 link is stored above without its tracking query string — the original included Facebook click-tracking parameters (`fbclid`, `utm_*`) which are safe to drop since they only affect ad-attribution, not the destination page.)*
+- **[ericblue/modern-start-page](https://github.com/ericblue/modern-start-page)** — Astro + React. Self-hosted start page with bookmarks, search, widgets, and theme customization.
+- **[Ljupcho1982/portal](https://github.com/Ljupcho1982/portal)** — Weather, sun times, exchange rates, news, mail, bookmarks, an app launcher, tasks, and a scratchpad on one page. No accounts, no server, no tracking.
+- **[StartPanelApp/StartPanelApp.github.io](https://github.com/StartPanelApp/StartPanelApp.github.io)** — React + TypeScript. Organizes favorite links alongside widgets for calendar, weather, images, radio, and Homey Pro smart-home control.
+- **[Galax028/startpage](https://github.com/Galax028/startpage)** — Minimal React startpage with customizable bookmarks (live at [startpage.galax.tech](https://startpage.galax.tech)).
+- **[timmyha/startpage](https://github.com/timmyha/startpage)** — Browser start page/dashboard written in React.
+- **[cipherbeta/react-startpage](https://github.com/cipherbeta/react-startpage)** — Serverless React-based startpage; minimal but functional.
+- **[serogbp/startpage-react](https://github.com/serogbp/startpage-react)** — Kanban-like bookmark manager as a startpage.
+- **[jnmcfly/awesome-startpage](https://github.com/jnmcfly/awesome-startpage)** — Not a dashboard itself, but a curated list of startpage projects; a good meta-resource for finding more.
 
 ## Links Reference (Research Sources)
 
