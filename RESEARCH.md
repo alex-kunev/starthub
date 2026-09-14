@@ -103,7 +103,9 @@ Option 2 (turnkey self-hosted apps) remains useful as a source of feature ideas 
 
 ## Similar Personal Dashboard / Start Page Repos
 
-Other individually-built, open-source personal start pages in the same spirit as [darekkay/dashboard](https://github.com/darekkay/dashboard) — small, self-authored projects (as opposed to the larger maintained "homelab" tools in the comparison table above) that combine bookmarks with widgets like clock, weather, and calendar:
+### Browser start pages (bookmark-centric)
+
+Individually-built, open-source personal start pages in the same spirit as [darekkay/dashboard](https://github.com/darekkay/dashboard) — small, self-authored projects (as opposed to the larger maintained "homelab" tools in the comparison table above) that combine bookmarks with widgets like clock, weather, and calendar:
 
 - **[ericblue/modern-start-page](https://github.com/ericblue/modern-start-page)** — Astro + React. Self-hosted start page with bookmarks, search, widgets, and theme customization.
 - **[Ljupcho1982/portal](https://github.com/Ljupcho1982/portal)** — Weather, sun times, exchange rates, news, mail, bookmarks, an app launcher, tasks, and a scratchpad on one page. No accounts, no server, no tracking.
@@ -113,6 +115,20 @@ Other individually-built, open-source personal start pages in the same spirit as
 - **[cipherbeta/react-startpage](https://github.com/cipherbeta/react-startpage)** — Serverless React-based startpage; minimal but functional.
 - **[serogbp/startpage-react](https://github.com/serogbp/startpage-react)** — Kanban-like bookmark manager as a startpage.
 - **[jnmcfly/awesome-startpage](https://github.com/jnmcfly/awesome-startpage)** — Not a dashboard itself, but a curated list of startpage projects; a good meta-resource for finding more.
+
+### Personal daily-glance / kiosk dashboards (content-centric, closer to Day-Planner-Dashboard)
+
+These are the closer match to what Day-Planner-Dashboard is doing: single-person builds oriented around *life content* (calendar, weather, tasks, habits, journal, quotes, even a generated daily blurb) rather than linking out to other services or self-hosted apps. Good source of "what content block should I add next" ideas.
+
+- **[MagicMirrorOrg/MagicMirror](https://github.com/MagicMirrorOrg/MagicMirror)** — The canonical open-source personal info display ("smart mirror"), Node.js-based. Built-in modules: clock, calendar, weather + forecast, news feed, compliments. Hundreds of community third-party modules add things like Spotify now-playing, public transit, stock tickers, and quotes — worth browsing the [3rd-party modules list](https://github.com/MagicMirrorOrg/MagicMirror/wiki/3rd-party-modules) purely for content ideas, even without adopting MagicMirror itself.
+- **[speedyg0nz/MagInkDash](https://github.com/speedyg0nz/MagInkDash)** — Raspberry Pi pulling Google Calendar + OpenWeatherMap + OpenAI-generated content to a battery-powered Inkplate 10 e-ink display. Notable idea: an AI-generated daily blurb/summary as its own content block.
+- **[malcolmosh/dailypi](https://github.com/malcolmosh/dailypi)** — E-paper dashboard on a Raspberry Pi Zero W showing daily tasks, events, and weather. Closest in scale and tone to Day-Planner-Dashboard.
+- **[JuhaniS/eInk](https://github.com/JuhaniS/eInk)** — 7.5" Waveshare e-ink home dashboard: clock, weather, transit departure board, daycare events, calendar, 7-day forecast. Good example of mixing family-logistics content with weather/transit.
+- **[kyleturman/home-dashboard](https://github.com/kyleturman/home-dashboard)** — Modular open-source e-paper home dashboard: weather forecasts, calendar events, vehicle data, and AI-generated insights. Vehicle data and "AI insights" are less-common content-block ideas worth noting.
+- **[b22floyd/life-dashboard](https://github.com/b22floyd/life-dashboard)** — Strongly content-over-integrations: journal entries, workouts, habit completions, personal tasks, meal plans, grocery items, cleaning tasks, annual goals, contacts, and weight tracking, all in one personal dashboard.
+- **[00xJS/Drafter](https://github.com/00xJS/Drafter)** — Home journal/planner (home, tasks, calendar, people, kitchen) with habits, routines, a weekly review, and a "briefing strip" — greeting, weather, work mode/hours, today's events, habits due, and dinner plan. The briefing-strip concept is directly reusable as a content block.
+- **[yogesh7547/DailyDash](https://github.com/yogesh7547/DailyDash)** — Small "start your day" dashboard: weather, quotes, to-dos, a focus timer, and local time.
+- **[garrisonbowen8-blip/daily-brief](https://github.com/garrisonbowen8-blip/daily-brief)** — Pulls Google Calendar/Gmail each morning and reads a spoken briefing via text-to-speech. Novel idea (voice briefing) even if the OAuth/email integration itself is heavier than this project needs.
 
 ## Links Reference (Research Sources)
 
