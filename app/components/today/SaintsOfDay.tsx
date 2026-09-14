@@ -12,16 +12,26 @@ type State =
   | { status: 'error' }
   | { status: 'ready'; extract: string };
 
-function fetchExtract(base: string, title: string): Promise<string> {
-  const url = `${base}?action=query&prop=extracts&exintro=1&explaintext=1&titles=${title}&format=json&origin=*`;
+// action=query&prop=extracts requires the TextExtracts MediaWiki extension,
+// which orthodoxwiki.org doesn't have installed (confirmed: the request
+// succeeds but returns pages with no "extract" field). action=parse is
+// core MediaWiki, always available, and returns rendered HTML — stripped
+// to plain text here in the browser.
+function fetchExtract(title: string): Promise<string> {
+  const url = `https://orthodoxwiki.org/api.php?action=parse&page=${title}&prop=text&formatversion=2&format=json&origin=*`;
   return fetch(url)
     .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
     .then((json) => {
-      const pages = json?.query?.pages;
-      const page = pages ? Object.values(pages)[0] : null;
-      const extract = (page as { extract?: string } | null)?.extract;
-      if (!extract) throw new Error('no extract in response');
-      return extract.slice(0, 600);
+      if (json.error) throw new Error(json.error.info ?? json.error.code ?? 'parse error');
+      const html = json.parse?.text;
+      if (!html) throw new Error('no page content in response');
+
+      const container = document.createElement('div');
+      container.innerHTML = html;
+      container.querySelectorAll('.mw-editsection, sup.reference, table, style').forEach((el) => el.remove());
+      const text = (container.textContent ?? '').replace(/\s+/g, ' ').trim();
+      if (!text) throw new Error('empty extract after stripping HTML');
+      return text.slice(0, 600);
     });
 }
 
@@ -40,21 +50,10 @@ export default function SaintsOfDay() {
     const d = String(now.getDate()).padStart(2, '0');
     setOcaUrl(`https://www.oca.org/saints/lives/${y}/${m}/${d}`);
 
-    // OrthodoxWiki runs on MediaWiki, which supports cross-origin API
-    // requests via an explicit origin=* parameter — no proxy needed. The
-    // API script's path varies between MediaWiki installs (root vs "/w/"),
-    // so try both rather than assuming one. Plain Promise chaining here
-    // (no async/await) — a static-export build of an async/await + for-of
-    // combination was shipping code that referenced regeneratorRuntime
-    // without defining it, breaking this widget in production.
-    fetchExtract('https://orthodoxwiki.org/api.php', title)
-      .catch((err) => {
-        console.error('Saints of the Day: fetch failed for orthodoxwiki.org/api.php', err);
-        return fetchExtract('https://orthodoxwiki.org/w/api.php', title);
-      })
+    fetchExtract(title)
       .then((extract) => setState({ status: 'ready', extract }))
       .catch((err) => {
-        console.error('Saints of the Day: fetch failed for orthodoxwiki.org/w/api.php', err);
+        console.error('Saints of the Day: fetch failed', err);
         setState({ status: 'error' });
       });
   }, []);
