@@ -73,8 +73,8 @@
   },
   {
     "name": "Ideas",
-    "emoji": "",
-    "color": ,
+    "emoji": "⏳",
+    "color": "D627F5",
     "links": [
       { "label": "EU Inc Explained", "url": "https://www.youtube.com/watch?v=xTi9_WQezFU" },
       { "label": "What is EU Inc", "url": "https://eu.inc/what-is-eu-inc" }
