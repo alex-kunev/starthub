@@ -367,6 +367,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.1rem;
+  margin-bottom: 2.5rem;
 }
 
 .bookmark-tile {
