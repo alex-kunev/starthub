@@ -17,14 +17,11 @@ export default function Home() {
 
       <section className="widgets-grid">
         <WeatherWidget />
+        <PictureOfDayWidget />
         <CalendarWidget />
       </section>
 
       <BookmarksSection categories={bookmarks} />
-
-      <section className="widgets-grid widgets-grid-single">
-        <PictureOfDayWidget />
-      </section>
     </main>
   );
 }
