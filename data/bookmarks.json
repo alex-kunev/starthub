@@ -18,9 +18,9 @@
     "links": [
       { "label": "Reuters", "url": "https://www.reuters.com/" },
       { "label": "БНТ новини", "url": "https://bntnews.bg/" },
-      { "label": "bNews.bg", "url": "https://bnews.bg/" },
-      { "label": "money.bg", "url": "https://money.bg/" },
-      { "label": "pariteni.bg", "url": "https://pariteni.bg/" }
+      { "label": "BNews", "url": "https://bnews.bg/" },
+      { "label": "Money.bg", "url": "https://money.bg/" },
+      { "label": "Pariteni.bg", "url": "https://pariteni.bg/" }
     ]
   },
   {
@@ -28,12 +28,12 @@
     "emoji": "🎯",
     "color": "#4ade80",
     "links": [
-      { "label": "sportal.bg", "url": "https://sportal.bg/" },
-      { "label": "FIA Formula 2 Calendar", "url": "https://www.fiaformula2.com/Calendar" },
-      { "label": "Celsi Blog", "url": "https://celsi.bg/blog/" },
-      { "label": "БНР – Музика (Sofia)", "url": "https://bnrnews.bg/sofia/list/muzica" },
+      { "label": "Спортал", "url": "https://sportal.bg/" },
+      { "label": "Formula 2", "url": "https://www.fiaformula2.com/Calendar" },
+      { "label": "Целси Блог", "url": "https://celsi.bg/blog/" },
+      { "label": "БНР Музика", "url": "https://bnrnews.bg/sofia/list/muzica" },
       { "label": "iFactsBG", "url": "https://ifactsbg.com/" },
-      { "label": "Vicove — Новини", "url": "https://www.vicove.biz/novi" }
+      { "label": "Вицове", "url": "https://www.vicove.biz/novi" }
     ]
   },
   {
@@ -41,8 +41,8 @@
     "emoji": "✝️",
     "color": "#c792ea",
     "links": [
-      { "label": "Българска патриаршия — Новини", "url": "https://bg-patriarshia.bg/news" },
-      { "label": "UOJ.news", "url": "https://uoj.news/" }
+      { "label": "БПЦ Новини", "url": "https://bg-patriarshia.bg/news" },
+      { "label": "UOJ News", "url": "https://uoj.news/" }
     ]
   },
   {
@@ -51,10 +51,10 @@
     "color": "#38bdf8",
     "links": [
       { "label": "Дневното четиво", "url": "https://www.facebook.com/DnevnotoChetivo" },
-      { "label": "Facebook Group", "url": "https://www.facebook.com/groups/2021908914616022" },
+      { "label": "Много лалета", "url": "https://www.facebook.com/groups/2021908914616022" },
       { "label": "Емилия Дворянова", "url": "https://www.facebook.com/emiliya.dvoryanova" },
       { "label": "Отец Владимир Дойчев", "url": "https://www.facebook.com/otecvladimir.doychev" },
-      { "label": "gkadiev", "url": "https://www.facebook.com/gkadiev/" }
+      { "label": "Георги Кадиев", "url": "https://www.facebook.com/gkadiev/" }
     ]
   },
   {
@@ -69,6 +69,15 @@
         "url": "https://poklonnik.bg/st_tour/%D0%BF%D0%BE%D0%BA%D0%BB%D0%BE%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B7%D0%B0-%D0%BF%D1%80%D0%B0%D0%B7%D0%BD%D0%B8%D0%BA%D0%B0-%D0%BD%D0%B0-%D1%81%D0%B2-%D0%B7%D0%BB%D0%B0%D1%82%D0%B0-%D0%BC%D1%8A%D0%B3/"
       },
       { "label": "Sofia Stage", "url": "https://sofiastage.com/" }
+    ]
+  },
+  {
+    "name": "Ideas",
+    "emoji": "",
+    "color": ,
+    "links": [
+      { "label": "EU Inc Explained", "url": "https://www.youtube.com/watch?v=xTi9_WQezFU" },
+      { "label": "What is EU Inc", "url": "https://eu.inc/what-is-eu-inc" }
     ]
   }
 ]
