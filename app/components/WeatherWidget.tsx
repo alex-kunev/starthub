@@ -10,13 +10,6 @@ interface CurrentWeather {
   weathercode: number;
 }
 
-interface DailyForecast {
-  time: string[];
-  weathercode: number[];
-  temperature_2m_max: number[];
-  temperature_2m_min: number[];
-}
-
 interface AirQuality {
   aqi: number;
   label: string;
@@ -25,7 +18,7 @@ interface AirQuality {
 type ForecastState =
   | { status: 'loading' }
   | { status: 'error' }
-  | { status: 'ready'; current: CurrentWeather; daily: DailyForecast };
+  | { status: 'ready'; current: CurrentWeather };
 
 function closestIndex(times: string[]): number {
   const now = Date.now();
@@ -48,10 +41,10 @@ export default function WeatherWidget() {
   useEffect(() => {
     const { latitude, longitude } = siteConfig.weather;
 
-    const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
+    const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`;
     fetch(forecastUrl)
       .then((res) => res.json())
-      .then((json) => setForecast({ status: 'ready', current: json.current_weather, daily: json.daily }))
+      .then((json) => setForecast({ status: 'ready', current: json.current_weather }))
       .catch(() => setForecast({ status: 'error' }));
 
     // Air quality is on a separate Open-Meteo host from the weather forecast.
@@ -92,21 +85,6 @@ export default function WeatherWidget() {
                 Air quality: {airQuality.label} ({airQuality.aqi})
               </span>
             )}
-          </div>
-
-          <div className="forecast-strip">
-            {forecast.daily.time.map((day, i) => (
-              <div className="forecast-day" key={day}>
-                <span className="forecast-day-label">
-                  {i === 0 ? 'Today' : new Date(day).toLocaleDateString([], { weekday: 'short' })}
-                </span>
-                <span className="forecast-icon">{weatherIcon(forecast.daily.weathercode[i])}</span>
-                <span className="forecast-temps">
-                  <strong>{Math.round(forecast.daily.temperature_2m_max[i])}°</strong>{' '}
-                  <span className="muted">{Math.round(forecast.daily.temperature_2m_min[i])}°</span>
-                </span>
-              </div>
-            ))}
           </div>
         </>
       )}

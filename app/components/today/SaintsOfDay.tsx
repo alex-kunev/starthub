@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Collapsible from './Collapsible';
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -65,7 +66,11 @@ export default function SaintsOfDay() {
       <h3>✝️ Saints of the Day</h3>
       {state.status === 'loading' && <p className="muted">Loading…</p>}
       {state.status === 'error' && <p className="muted">Couldn&apos;t load a summary — see the links below.</p>}
-      {state.status === 'ready' && <p className="clamp-text">{state.extract}</p>}
+      {state.status === 'ready' && (
+        <Collapsible>
+          <p className="clamp-text">{state.extract}</p>
+        </Collapsible>
+      )}
       <div className="today-links">
         <a href={wikiUrl} target="_blank" rel="noreferrer">OrthodoxWiki →</a>
         <a href={ocaUrl} target="_blank" rel="noreferrer">OCA Lives of the Saints →</a>

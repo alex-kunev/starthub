@@ -170,7 +170,7 @@ body {
   gap: 0.3rem;
   padding: 0.5rem 0.6rem;
   border-radius: 10px;
-  min-width: 42px;
+  min-width: 52px;
 }
 
 .week-day-label {
@@ -184,12 +184,32 @@ body {
   font-weight: 600;
 }
 
+.week-day-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.week-day-temps {
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.week-day-min {
+  color: var(--muted);
+}
+
+.week-day-past {
+  opacity: 0.55;
+}
+
 .week-day-today {
   background: linear-gradient(135deg, var(--accent), var(--accent-cyan));
 }
 
 .week-day-today .week-day-label,
-.week-day-today .week-day-number {
+.week-day-today .week-day-number,
+.week-day-today .week-day-temps,
+.week-day-today .week-day-min {
   color: #0b0e14;
 }
 
@@ -207,6 +227,41 @@ body {
   color: var(--text);
   font-size: 0.9rem;
   line-height: 1.5;
+}
+
+.collapsible {
+  position: relative;
+  max-height: 8rem;
+  overflow: hidden;
+}
+
+.collapsible-expanded {
+  max-height: none;
+}
+
+.collapsible-faded::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2.5rem;
+  background: linear-gradient(transparent, var(--surface-2));
+  pointer-events: none;
+}
+
+.collapsible-toggle {
+  margin-top: 0.4rem;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.collapsible-toggle:hover {
+  text-decoration: underline;
 }
 
 .events-list {
@@ -276,7 +331,6 @@ body {
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
 }
 
 .weather-icon {
@@ -305,37 +359,6 @@ body {
 .aqi-poor { color: #fb923c; border-color: #fb923c; }
 .aqi-very-poor { color: var(--accent-red); border-color: var(--accent-red); }
 .aqi-extremely-poor { color: var(--accent-pink); border-color: var(--accent-pink); }
-
-.forecast-strip {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.4rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.forecast-day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.4rem 0.15rem;
-  border-radius: 8px;
-}
-
-.forecast-day-label {
-  font-size: 0.72rem;
-  color: var(--muted);
-}
-
-.forecast-icon {
-  font-size: 1.3rem;
-}
-
-.forecast-temps {
-  font-size: 0.82rem;
-  white-space: nowrap;
-}
 
 .calendar-embed {
   width: 100%;
@@ -418,8 +441,15 @@ body {
     font-size: 2.1rem;
   }
 
-  .forecast-strip {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    row-gap: 0.75rem;
+  .week-strip {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.2rem;
+    width: 100%;
+  }
+
+  .week-day {
+    min-width: 0;
+    padding: 0.45rem 0.1rem;
   }
 }
