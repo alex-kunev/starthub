@@ -15,13 +15,13 @@ export default function Home() {
 
       <TodayTile />
 
+      <BookmarksSection categories={bookmarks} />
+
       <section className="widgets-grid">
         <WeatherWidget />
         <PictureOfDayWidget />
         <CalendarWidget />
       </section>
-
-      <BookmarksSection categories={bookmarks} />
     </main>
   );
 }

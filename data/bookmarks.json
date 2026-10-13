@@ -1,5 +1,17 @@
 [
   {
+    "name": "Current",
+    "emoji": "⚡",
+    "color": "#f472b6",
+    "links": [
+      { "label": "eMag", "url": "https://www.emag.bg/" },
+      { "label": "Booking", "url": "https://www.booking.com/" },
+      { "label": "LinkedIn", "url": "https://www.linkedin.com/feed/" },
+      { "label": "Claude", "url": "https://claude.ai/" },
+      { "label": "Readest", "url": "https://web.readest.com/library" }
+    ]
+  },
+  {
     "name": "Tech",
     "emoji": "💻",
     "color": "#5b9dff",
@@ -29,10 +41,10 @@
     "color": "#4ade80",
     "links": [
       { "label": "Спортал", "url": "https://sportal.bg/" },
-      { "label": "Formula 2", "url": "https://www.fiaformula2.com/Calendar" },
+      { "label": "Club S1", "url": "https://www.clubs1.net/" },
       { "label": "Целси Блог", "url": "https://celsi.bg/blog/" },
       { "label": "БНР Музика", "url": "https://bnrnews.bg/sofia/list/muzica" },
-      { "label": "iFactsBG", "url": "https://ifactsbg.com/" },
+      { "label": "Collider", "url": "https://collider.com/" },
       { "label": "Вицове", "url": "https://www.vicove.biz/novi" }
     ]
   },
@@ -42,7 +54,8 @@
     "color": "#c792ea",
     "links": [
       { "label": "БПЦ Новини", "url": "https://bg-patriarshia.bg/news" },
-      { "label": "UOJ News", "url": "https://uoj.news/" }
+      { "label": "UOJ News", "url": "https://uoj.news/" },
+      { "label": "Богоносци", "url": "https://www.bogonosci.bg/" }
     ]
   },
   {

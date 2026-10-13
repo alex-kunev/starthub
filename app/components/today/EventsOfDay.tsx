@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Collapsible from './Collapsible';
 
 interface WikiEvent {
   text: string;
@@ -40,13 +41,15 @@ export default function EventsOfDay() {
       {state.status === 'loading' && <p className="muted">Loading…</p>}
       {state.status === 'error' && <p className="muted">Unable to load events.</p>}
       {state.status === 'ready' && (
-        <ul className="events-list">
-          {state.events.map((event) => (
-            <li key={`${event.year}-${event.text.slice(0, 20)}`}>
-              <strong>{event.year}</strong> — {event.text}
-            </li>
-          ))}
-        </ul>
+        <Collapsible>
+          <ul className="events-list">
+            {state.events.map((event) => (
+              <li key={`${event.year}-${event.text.slice(0, 20)}`}>
+                <strong>{event.year}</strong> — {event.text}
+              </li>
+            ))}
+          </ul>
+        </Collapsible>
       )}
     </div>
   );
