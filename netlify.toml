@@ -11,3 +11,15 @@
 [build.processing.css]
   bundle = false
   minify = false
+
+[functions]
+  directory = "netlify/functions"
+
+# The frontend always calls /api/calendar (the path Vercel's zero-config
+# serverless functions use natively, via api/calendar.js). On Netlify,
+# functions instead live at /.netlify/functions/*, so this redirect makes
+# the same frontend path work on either host without an env-var branch.
+[[redirects]]
+  from = "/api/calendar"
+  to = "/.netlify/functions/calendar"
+  status = 200
