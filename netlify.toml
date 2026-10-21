@@ -23,3 +23,8 @@
   from = "/api/calendar"
   to = "/.netlify/functions/calendar"
   status = 200
+
+[[redirects]]
+  from = "/api/bookmarks"
+  to = "/.netlify/functions/bookmarks"
+  status = 200

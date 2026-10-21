@@ -1,4 +1,3 @@
-import bookmarks from '@/data/bookmarks.json';
 import BookmarksSection from './components/BookmarksSection';
 import CalendarWidget from './components/CalendarWidget';
 import PictureOfDayWidget from './components/PictureOfDayWidget';
@@ -14,7 +13,7 @@ export default function Home() {
 
       <TodayTile />
 
-      <BookmarksSection categories={bookmarks} />
+      <BookmarksSection />
 
       <section className="widgets-grid">
         <PictureOfDayWidget />

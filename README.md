@@ -6,7 +6,7 @@ A personal daily start page — clock & week view, saints of the day and "on thi
 
 - **Next.js** (App Router, static export — `output: 'export'` in `next.config.js`)
 - **React**, TypeScript, plain CSS (no UI framework/dependency beyond Next itself)
-- Most data is fetched client-side from free, keyless public APIs; the calendar widget is the one exception — it goes through a small serverless function so a private calendar can stay private (see below)
+- Most data is fetched client-side from free, keyless public APIs; the calendar and bookmarks widgets are the exceptions — both go through small serverless functions (see **Calendar Setup** and **Bookmarks Setup** below)
 
 ## Running Locally
 
@@ -29,20 +29,18 @@ Output goes to `out/` — a plain static site, deployable to any static file ser
 
 | Widget | Source | Notes |
 |---|---|---|
-| Clock & week view | Local browser time | No network call |
+| Clock & week view | Local browser time + [Open-Meteo](https://open-meteo.com/) for the per-day forecast | No key needed; edit coordinates in `lib/config.ts` |
 | Saints of the day | [OrthodoxWiki](https://orthodoxwiki.org/) (via its MediaWiki API), linking out to [OCA's Lives of the Saints](https://www.oca.org/saints/lives) | Gregorian-dated page per day; falls back to link-only if the summary fetch fails |
 | On this day | [Wikipedia "On this day" API](https://en.wikipedia.org/api/rest_v1/) | No key needed |
-| Weather + 7-day forecast | [Open-Meteo](https://open-meteo.com/) | No key needed; edit coordinates in `lib/config.ts` |
-| Air quality | [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) | European AQI |
 | Calendar | Google Calendar's private "secret address in iCal format", fetched server-side by a small function | Calendar stays private — see **Calendar Setup** below |
 | Picture of the day | Wikimedia Commons' "Picture of the Day", via Wikipedia's REST API | No key needed |
-| Bookmarks | `data/bookmarks.json` | Config-as-code — each category renders as its own tile |
+| Bookmarks | A shared Upstash Redis store, fetched/edited through a small serverless function | Editable from the page itself, synced across devices — see **Bookmarks Setup** below |
 
 ## Configuration
 
 - **Weather location** — edit `lib/config.ts` (`siteConfig.weather`).
 - **Calendar** — see **Calendar Setup** below; it's an environment variable, not something you edit in the repo.
-- **Bookmarks** — edit `data/bookmarks.json` directly; each entry is `{ "name": "Category", "emoji": "💻", "color": "#5b9dff", "links": [{ "label": "...", "url": "..." }] }`.
+- **Bookmarks** — edit live from the page (click "Edit favorites"); see **Bookmarks Setup** below. `data/bookmarks.json` still exists as the seed/fallback value and a human-readable backup.
 
 ## Calendar Setup (stays private — no public calendar sharing needed)
 
@@ -60,6 +58,24 @@ Both share the same ICS fetch/parse logic in `lib/calendar/parseIcs.js`.
 3. For local development, put it in `.env.local` (already gitignored) — see `.env.example`.
 
 Treat that URL as a credential: anyone with it can read your calendar. You can reset it anytime from the same "Integrate calendar" page if it ever leaks.
+
+## Bookmarks Setup (editable from the page, synced across devices)
+
+The bookmarks grid is editable in place — click **"Edit favorites"** to rename/reorder/delete/add categories and links, with up/down buttons for reordering and a native color picker per category. It reads and writes through `/api/bookmarks`, same two-function pattern as the calendar (`api/bookmarks.js` for Vercel, `netlify/functions/bookmarks.js` for Netlify, redirected from the same `/api/bookmarks` path).
+
+The store itself is deliberately **not** a platform-native one (Netlify Blobs / Vercel KV) — since this project can be deployed to both hosts, those two stores wouldn't share data with each other. Instead it uses **[Upstash Redis](https://upstash.com/)**, whose REST API is just Bearer-token HTTP calls with no platform SDK, so the identical store code (`lib/bookmarks/store.js`) works from either host against one shared backend.
+
+**Setup:**
+
+1. Create a free Redis database at [upstash.com](https://upstash.com/) (no credit card needed for the free tier).
+2. From its dashboard, copy the **REST URL** and **REST Token**.
+3. Set three environment variables in your hosting platform's dashboard (Netlify: Site configuration → Environment variables; Vercel: Project Settings → Environment Variables):
+   - `UPSTASH_REDIS_REST_URL`
+   - `UPSTASH_REDIS_REST_TOKEN`
+   - `BOOKMARKS_EDIT_TOKEN` — a password of your choosing that gates **writes** (reads are public, same as the rest of the page). Pick something random; this is what you type into the "Edit token" field in the UI. The browser remembers it in `localStorage` after the first successful save, so you only enter it once per device.
+4. For local development, put all three in `.env.local` (already gitignored) — see `.env.example`.
+
+Before the first edit is ever saved, `GET /api/bookmarks` falls back to the committed `data/bookmarks.json` as seed data, so the page always has something to show.
 
 ## Deploying to Netlify
 
