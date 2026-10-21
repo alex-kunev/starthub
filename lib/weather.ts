@@ -38,14 +38,3 @@ export function weatherLabel(code: number): string {
 export function weatherIcon(code: number): string {
   return WEATHER_CODES[code]?.icon ?? '🌡️';
 }
-
-// European Air Quality Index bands (0-100+), per the EEA scale that
-// Open-Meteo's `european_aqi` field follows.
-export function aqiLabel(aqi: number): string {
-  if (aqi <= 20) return 'Good';
-  if (aqi <= 40) return 'Fair';
-  if (aqi <= 60) return 'Moderate';
-  if (aqi <= 80) return 'Poor';
-  if (aqi <= 100) return 'Very Poor';
-  return 'Extremely Poor';
-}

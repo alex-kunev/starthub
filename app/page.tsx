@@ -3,7 +3,6 @@ import BookmarksSection from './components/BookmarksSection';
 import CalendarWidget from './components/CalendarWidget';
 import PictureOfDayWidget from './components/PictureOfDayWidget';
 import TodayTile from './components/TodayTile';
-import WeatherWidget from './components/WeatherWidget';
 
 export default function Home() {
   return (
@@ -18,7 +17,6 @@ export default function Home() {
       <BookmarksSection categories={bookmarks} />
 
       <section className="widgets-grid">
-        <WeatherWidget />
         <PictureOfDayWidget />
         <CalendarWidget />
       </section>

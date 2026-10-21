@@ -89,7 +89,6 @@ body {
   background: linear-gradient(90deg, var(--accent), var(--accent-cyan), var(--accent-purple), var(--accent-pink));
 }
 
-.weather-widget::before { background: var(--accent-cyan); }
 .calendar-widget::before { background: var(--accent-purple); }
 .photo-widget::before { background: var(--accent-pink); }
 
@@ -304,10 +303,6 @@ body {
   margin-bottom: 2.5rem;
 }
 
-.weather-widget {
-  flex: 1 1 100%;
-}
-
 .calendar-widget {
   flex: 2 1 420px;
 }
@@ -326,39 +321,6 @@ body {
   max-width: 460px;
 }
 
-.weather-current {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.weather-icon {
-  font-size: 2.5rem;
-  line-height: 1;
-}
-
-.weather-temp {
-  font-size: 1.9rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.aqi-badge {
-  margin-left: auto;
-  font-size: 0.78rem;
-  padding: 0.3rem 0.65rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  white-space: nowrap;
-}
-
-.aqi-good { color: var(--accent-green); border-color: var(--accent-green); }
-.aqi-fair { color: #a3e635; border-color: #a3e635; }
-.aqi-moderate { color: var(--accent-amber); border-color: var(--accent-amber); }
-.aqi-poor { color: #fb923c; border-color: #fb923c; }
-.aqi-very-poor { color: var(--accent-red); border-color: var(--accent-red); }
-.aqi-extremely-poor { color: var(--accent-pink); border-color: var(--accent-pink); }
 
 .photo-widget figure {
   margin: 0;
